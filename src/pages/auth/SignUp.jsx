@@ -41,12 +41,12 @@ const SignUp = () => {
 
     // Step 2: Insert profile - same pattern, adds phone_number + role
     if (signUpData?.user) {
-      const { error: profileError } = await supabase.from('profiles').insert({
+      const { error: profileError } = await supabase.from('profiles').upsert({
         id: signUpData.user.id,
         name: signUpForm.name,
         email: signUpForm.email,
         phone_number: signUpForm.phone_number,
-        role: 'customer', // default role
+        role: 'customer',
       });
 
       if (profileError) alert(profileError.message);
