@@ -55,7 +55,7 @@ const Bookings = () => {
       action: `RESERVATION_${newStatus.toUpperCase()}`,
       table_name: 'customer_reservations',
       record_id: id,
-      details: `Reservation ${id.slice(0,8)} marked as ${newStatus}`,
+      details: `Reservation ${id.slice(0, 8)} marked as ${newStatus}`,
     });
 
     setReservations(prev => prev.map(r => r.id === id ? { ...r, status: newStatus } : r));
@@ -73,7 +73,7 @@ const Bookings = () => {
         </div>
         {/* Filter tabs */}
         <div className="flex gap-2">
-          {['all','pending','confirmed','completed','cancelled'].map(s => (
+          {['all', 'pending', 'confirmed', 'completed', 'cancelled'].map(s => (
             <button key={s}
               onClick={() => setFilterStatus(s)}
               className={`btn btn-xs rounded-full capitalize ${filterStatus === s ? 'btn-neutral' : 'btn-ghost border border-gray-300'}`}
@@ -93,7 +93,7 @@ const Bookings = () => {
               <div className="flex justify-between items-start mb-3">
                 <div>
                   <p className="font-bold">{res.profiles?.name || 'Customer'}</p>
-                  <p className="text-xs text-gray-400">ID: {res.id?.slice(0,14).toUpperCase()}</p>
+                  <p className="text-xs text-gray-400">ID: {res.id?.slice(0, 14).toUpperCase()}</p>
                 </div>
                 <span className={`badge capitalize ${statusBadge(res.status)}`}>{res.status}</span>
               </div>

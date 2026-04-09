@@ -43,8 +43,8 @@ const Step1 = ({ tables, booking, setBooking, profile, onNext, onCancel }) => {
 
   const daysInMonth = getDaysInMonth(calendar.getFullYear(), calendar.getMonth());
   const startDay = firstDay(calendar.getFullYear(), calendar.getMonth());
-  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  const dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   const selectDate = (day) => {
     const d = new Date(calendar.getFullYear(), calendar.getMonth(), day);
@@ -98,7 +98,7 @@ const Step1 = ({ tables, booking, setBooking, profile, onNext, onCancel }) => {
           {Array.from({ length: (startDay === 0 ? 6 : startDay - 1) }).map((_, i) => <div key={`e-${i}`} />)}
           {Array.from({ length: daysInMonth }).map((_, i) => {
             const day = i + 1;
-            const dateStr = `${calendar.getFullYear()}-${String(calendar.getMonth() + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+            const dateStr = `${calendar.getFullYear()}-${String(calendar.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             const isSelected = booking.date === dateStr;
             return (
               <button
@@ -335,8 +335,8 @@ const Step3 = ({ booking, tables, profile, onBack, onConfirm, submitting }) => {
         <div className="flex justify-between text-gray-600 mb-1">
           <span>Table {table?.table_number} ({(() => {
             if (!booking.start_time || !booking.end_time) return '0';
-            const [sh,sm] = booking.start_time.split(':').map(Number);
-            const [eh,em] = booking.end_time.split(':').map(Number);
+            const [sh, sm] = booking.start_time.split(':').map(Number);
+            const [eh, em] = booking.end_time.split(':').map(Number);
             return Math.max(0, (eh * 60 + em - (sh * 60 + sm)) / 60).toFixed(1);
           })()} hr)</span>
           <span>₱{tableTotal.toFixed(2)}</span>

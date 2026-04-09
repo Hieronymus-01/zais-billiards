@@ -90,7 +90,7 @@ const Sales = () => {
                 const items = tx.items ? JSON.parse(tx.items) : [];
                 return (
                   <tr key={tx.id} className="text-sm">
-                    <td className="font-mono text-xs text-gray-400">{tx.id?.slice(0,8).toUpperCase()}</td>
+                    <td className="font-mono text-xs text-gray-400">{tx.id?.slice(0, 8).toUpperCase()}</td>
                     <td>{tx.profiles?.name || tx.profiles?.email || '—'}</td>
                     <td className="text-xs text-gray-500 max-w-xs truncate">
                       {items.map(i => `${i.product_name} x${i.qty}`).join(', ') || '—'}

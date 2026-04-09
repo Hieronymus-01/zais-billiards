@@ -115,7 +115,7 @@ const Dashboard = () => {
           <p className="font-semibold mb-1">Weekly Revenue</p>
           <p className="text-xs text-gray-400 mb-4">Revenue trends for the past week</p>
           <div className="flex items-end gap-2 h-28">
-            {['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map((day, i) => (
+            {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, i) => (
               <div key={day} className="flex-1 flex flex-col items-center gap-1">
                 <div
                   className="w-full bg-indigo-400 rounded-sm"
@@ -162,11 +162,10 @@ const Dashboard = () => {
                     Table {res.table_id} — {res.start_time} to {res.end_time}
                   </p>
                 </div>
-                <span className={`badge badge-sm capitalize ${
-                  res.status === 'confirmed' ? 'badge-success' :
+                <span className={`badge badge-sm capitalize ${res.status === 'confirmed' ? 'badge-success' :
                   res.status === 'pending' ? 'badge-warning' :
-                  res.status === 'cancelled' ? 'badge-error' : 'badge-info'
-                }`}>{res.status}</span>
+                    res.status === 'cancelled' ? 'badge-error' : 'badge-info'
+                  }`}>{res.status}</span>
               </div>
             ))}
           </div>
