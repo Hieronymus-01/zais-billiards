@@ -51,7 +51,7 @@ const Tables = () => {
     fetchTables();
   };
 
-  // Same delete pattern as event-gate
+
   const handleDelete = async (table) => {
     if (!confirm(`Delete Table ${table.table_number}?`)) return;
     const { error } = await supabase.from('tables').delete().eq('id', table.id);
