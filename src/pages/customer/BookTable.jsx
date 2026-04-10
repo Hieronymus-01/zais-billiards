@@ -139,11 +139,15 @@ const Step1 = ({ tables, booking, setBooking, profile, onNext, onCancel }) => {
             </div>
           )}
         </div>
-        <div>
+        <div className="w-40">
           <p className="text-sm font-semibold mb-2">👥 Number of Players</p>
-          <input type="number" min="1" max="10" className="input input-bordered input-sm w-full"
+          <label className="text-xs text-gray-500">Players</label>
+          <input
+            type="number" min="1" max="10"
+            className="input input-bordered input-sm w-full"
             value={booking.num_players}
-            onChange={e => setBooking(prev => ({ ...prev, num_players: e.target.value }))} />
+            onChange={e => setBooking(prev => ({ ...prev, num_players: e.target.value }))}
+          />
         </div>
       </div>
 

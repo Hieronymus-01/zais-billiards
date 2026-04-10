@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useRef, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { SessionContext } from '../Contexts/SessionContexts';
 import { supabase } from '../utils/Supabase';
@@ -10,13 +10,22 @@ const NavBar = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({
-    name: '',
-    email: '',
-    phone_number: '',
-  });
+  const [form, setForm] = useState({ name: '', email: '', phone_number: '' });
+  const dropdownRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleLogout = async () => {
+    setShowDropdown(false);
     await supabase.auth.signOut();
     navigate('/');
   };
@@ -35,20 +44,16 @@ const NavBar = () => {
     setSaving(true);
     const { data, error } = await supabase
       .from('profiles')
-      .update({
-        name: form.name,
-        phone_number: form.phone_number,
-      })
+      .update({ name: form.name, phone_number: form.phone_number })
       .eq('id', profile.id)
       .select()
       .single();
 
-    if (error) {
-      alert(error.message);
-    } else {
+    if (error) alert(error.message);
+    else {
       setProfile(data);
       setShowModal(false);
-      alert('Profile updated successfully!');
+      alert('Profile updated!');
     }
     setSaving(false);
   };
@@ -73,36 +78,27 @@ const NavBar = () => {
 
           {/* Nav Links */}
           <div className="flex items-center gap-2">
-            <NavLink to="/book" className={({ isActive }) => `btn btn-sm rounded-full ${isActive ? 'btn-neutral' : 'btn-ghost'}`}>
-              HOME
-            </NavLink>
-            <NavLink to="/book" className={({ isActive }) => `btn btn-sm rounded-full ${isActive ? 'btn-neutral' : 'btn-ghost'}`}>
-              BOOK
-            </NavLink>
+            <NavLink end to="/" className={({ isActive }) => `btn btn-sm rounded-full ${isActive ? 'btn-neutral' : 'btn-ghost'}`}>HOME</NavLink>
+            <NavLink to="/book" className={({ isActive }) => `btn btn-sm rounded-full ${isActive ? 'btn-neutral' : 'btn-ghost'}`}>BOOK</NavLink>
             {session && (
-              <NavLink to="/my-reservations" className={({ isActive }) => `btn btn-sm rounded-full ${isActive ? 'btn-neutral' : 'btn-ghost'}`}>
-                MY RESERVATION
-              </NavLink>
+              <NavLink to="/my-reservations" className={({ isActive }) => `btn btn-sm rounded-full ${isActive ? 'btn-neutral' : 'btn-ghost'}`}>MY RESERVATION</NavLink>
             )}
 
-            {/* Profile Icon with Dropdown */}
+            {/* Profile Dropdown */}
             {session ? (
-              <div className="relative">
+              <div className="relative" ref={dropdownRef}>
                 <button
-                  onClick={() => setShowDropdown(!showDropdown)}
-                  onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
-                  className="btn btn-sm btn-ghost rounded-full flex items-center gap-2"
+                  onClick={() => setShowDropdown(prev => !prev)}
+                  className="btn btn-sm btn-ghost rounded-full"
                 >
-                  {/* Avatar circle with initial */}
                   <div className="w-7 h-7 rounded-full bg-black text-white flex items-center justify-center text-xs font-bold">
                     {profile?.name?.[0]?.toUpperCase() || <FaUser />}
                   </div>
                 </button>
 
-                {/* Dropdown */}
                 {showDropdown && (
                   <div className="absolute right-0 top-10 w-56 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden">
-                    {/* Profile Info Header */}
+                    {/* Header */}
                     <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
                       <p className="font-semibold text-sm text-black truncate">{profile?.name || 'User'}</p>
                       <p className="text-xs text-gray-400 truncate">{profile?.email}</p>
@@ -111,7 +107,7 @@ const NavBar = () => {
 
                     {/* Edit Profile */}
                     <button
-                      onClick={openEditModal}
+                      onMouseDown={openEditModal}
                       className="w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-gray-50 transition-colors text-left"
                     >
                       <FaEdit className="text-gray-400" />
@@ -120,7 +116,7 @@ const NavBar = () => {
 
                     {/* Logout */}
                     <button
-                      onClick={handleLogout}
+                      onMouseDown={handleLogout}
                       className="w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-red-50 text-red-500 transition-colors text-left border-t border-gray-100"
                     >
                       <FaSignOutAlt />
@@ -131,14 +127,7 @@ const NavBar = () => {
               </div>
             ) : (
               <NavLink to="/log-in" className="btn btn-sm btn-ghost rounded-full">
-                <FaUser className="text-sm" />
-              </NavLink>
-            )}
-
-            {/* Logout icon for non-session (optional) */}
-            {!session && (
-              <NavLink to="/log-in" className="btn btn-sm btn-ghost rounded-full">
-                <FaSignOutAlt className="text-sm" />
+                <FaUser />
               </NavLink>
             )}
           </div>
@@ -148,9 +137,8 @@ const NavBar = () => {
       {/* Edit Profile Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4">
 
-            {/* Modal Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
               <h2 className="text-lg font-bold">Edit Profile</h2>
               <button onClick={() => setShowModal(false)} className="btn btn-ghost btn-sm btn-circle">
@@ -158,11 +146,8 @@ const NavBar = () => {
               </button>
             </div>
 
-            {/* Modal Body */}
             <div className="px-6 py-5 space-y-4">
-
-              {/* Avatar */}
-              <div className="flex justify-center mb-2">
+              <div className="flex justify-center">
                 <div className="w-16 h-16 rounded-full bg-black text-white flex items-center justify-center text-2xl font-bold">
                   {form.name?.[0]?.toUpperCase() || <FaUser />}
                 </div>
@@ -202,11 +187,8 @@ const NavBar = () => {
               </div>
             </div>
 
-            {/* Modal Footer */}
             <div className="flex justify-end gap-3 px-6 py-4 border-t border-gray-100 bg-gray-50">
-              <button onClick={() => setShowModal(false)} className="btn btn-ghost rounded-full">
-                Cancel
-              </button>
+              <button onClick={() => setShowModal(false)} className="btn btn-ghost rounded-full">Cancel</button>
               <button onClick={handleSave} disabled={saving} className="btn btn-neutral rounded-full">
                 {saving ? 'Saving...' : 'Save Changes'}
               </button>

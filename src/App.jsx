@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import './App.css';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { supabase } from './utils/Supabase';
 import { SessionContext } from './Contexts/SessionContexts';
 
@@ -23,11 +23,47 @@ import Inventory from './pages/admin/Inventory';
 import Analytics from './pages/admin/Analytics';
 import AuditTrail from './pages/admin/AuditTrail';
 
+// ─── Protected Route for Admin/Staff/Owner ───────────────────────────────────
+const AdminRoute = ({ children }) => {
+  const { session, profile } = useContext(SessionContext);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!session) {
+      navigate('/log-in');
+    } else if (profile && !['owner', 'staff'].includes(profile.role)) {
+      navigate('/'); // customers get redirected to homepage
+    }
+  }, [session, profile]);
+
+  // Still loading profile
+  if (session && !profile) return null;
+
+  return children;
+};
+
+// ─── Protected Route for Customers ───────────────────────────────────────────
+const CustomerRoute = ({ children }) => {
+  const { session } = useContext(SessionContext);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!session) navigate('/log-in');
+  }, [session]);
+
+  return children;
+};
+
 function App() {
   const [session, setSession] = useState(null);
   const [profile, setProfile] = useState(null);
 
   useEffect(() => {
+    // Get initial session on page load
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) setSession(session);
+    });
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
@@ -39,9 +75,7 @@ function App() {
       }
     });
 
-    return () => {
-      subscription.unsubscribe();
-    };
+    return () => subscription.unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -67,19 +101,19 @@ function App() {
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/log-in" element={<Login />} />
 
-        {/* Customer */}
-        <Route path="/book" element={<BookTable />} />
-        <Route path="/my-reservations" element={<MyReservations />} />
+        {/* Customer Protected */}
+        <Route path="/book" element={<CustomerRoute><BookTable /></CustomerRoute>} />
+        <Route path="/my-reservations" element={<CustomerRoute><MyReservations /></CustomerRoute>} />
 
-        {/* Admin / Staff / Owner */}
-        <Route path="/admin/dashboard" element={<Dashboard />} />
-        <Route path="/admin/pos" element={<POS />} />
-        <Route path="/admin/tables" element={<Tables />} />
-        <Route path="/admin/bookings" element={<Bookings />} />
-        <Route path="/admin/sales" element={<Sales />} />
-        <Route path="/admin/inventory" element={<Inventory />} />
-        <Route path="/admin/analytics" element={<Analytics />} />
-        <Route path="/admin/audit-trail" element={<AuditTrail />} />
+        {/* Admin Protected */}
+        <Route path="/admin/dashboard" element={<AdminRoute><Dashboard /></AdminRoute>} />
+        <Route path="/admin/pos" element={<AdminRoute><POS /></AdminRoute>} />
+        <Route path="/admin/tables" element={<AdminRoute><Tables /></AdminRoute>} />
+        <Route path="/admin/bookings" element={<AdminRoute><Bookings /></AdminRoute>} />
+        <Route path="/admin/sales" element={<AdminRoute><Sales /></AdminRoute>} />
+        <Route path="/admin/inventory" element={<AdminRoute><Inventory /></AdminRoute>} />
+        <Route path="/admin/analytics" element={<AdminRoute><Analytics /></AdminRoute>} />
+        <Route path="/admin/audit-trail" element={<AdminRoute><AuditTrail /></AdminRoute>} />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" />} />
