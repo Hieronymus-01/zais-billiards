@@ -9,7 +9,6 @@ const Login = () => {
   const { session, profile } = useContext(SessionContext);
   const navigate = useNavigate();
 
-  // Same redirect logic as event-gate, but with 3 roles
   useEffect(() => {
     if (profile?.role === 'customer') {
       navigate('/');
@@ -18,7 +17,6 @@ const Login = () => {
     }
   }, [profile, navigate]);
 
-  // Same handleSubmit pattern as event-gate Login.jsx
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
@@ -32,12 +30,29 @@ const Login = () => {
       password: loginForm.password,
     });
 
-    if (error) alert(error.message);
+    if (error) { alert(error.message); return; }
+
+    // Manually fetch profile after login to determine role
+    if (data?.user) {
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', data.user.id)
+        .single();
+
+      if (profileError) { alert(profileError.message); return; }
+
+      if (profileData?.role === 'owner' || profileData?.role === 'staff') {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/');
+      }
+    }
   };
 
   return (
     <div className="min-h-screen flex">
-      {/* Left black branding panel - from wireframe */}
+      {/* Left black branding panel */}
       <div className="w-80 bg-black flex flex-col items-center justify-center flex-shrink-0">
         <div className="w-24 h-24 rounded-full bg-white flex items-center justify-center mb-4">
           <span className="text-black font-bold text-sm">LOGO</span>
@@ -49,7 +64,7 @@ const Login = () => {
       {/* Right form panel */}
       <div className="flex-1 flex items-center justify-center bg-white px-8">
         <div className="w-full max-w-md">
-          {/* Tab switcher - from wireframe */}
+          {/* Tab switcher */}
           <div className="flex mb-8 border-b border-gray-200">
             <button className="flex-1 py-3 text-sm font-bold border-b-2 border-black text-black">
               Log In
