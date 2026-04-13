@@ -2,18 +2,18 @@ import React, { useState, useContext, useRef, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { SessionContext } from '../Contexts/SessionContexts';
 import { supabase } from '../utils/Supabase';
-import { FaUser, FaSignOutAlt, FaEdit, FaTimes } from 'react-icons/fa';
+import { FaUser, FaSignOutAlt, FaEdit, FaTimes, FaBars } from 'react-icons/fa';
 
 const NavBar = () => {
   const { session, profile, setProfile } = useContext(SessionContext);
   const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', phone_number: '' });
   const dropdownRef = useRef(null);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -24,8 +24,14 @@ const NavBar = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Close mobile menu on route change
+  useEffect(() => {
+    setShowMobileMenu(false);
+  }, [navigate]);
+
   const handleLogout = async () => {
     setShowDropdown(false);
+    setShowMobileMenu(false);
     await supabase.auth.signOut();
     navigate('/');
   };
@@ -37,6 +43,7 @@ const NavBar = () => {
       phone_number: profile?.phone_number || '',
     });
     setShowDropdown(false);
+    setShowMobileMenu(false);
     setShowModal(true);
   };
 
@@ -60,31 +67,29 @@ const NavBar = () => {
 
   return (
     <>
-      <div className="navbar bg-base-100 shadow-sm border-b border-gray-200">
-        <div className="flex w-full max-w-7xl mx-auto px-4">
+      <div className="navbar bg-base-100 shadow-sm border-b border-gray-200 px-4">
+        <div className="flex items-center justify-between w-full max-w-7xl mx-auto">
 
           {/* Brand */}
-          <div className="flex-1">
-            <NavLink to="/" className="btn btn-ghost px-0 flex flex-col items-start leading-none h-auto py-1">
-              <span className="text-xl font-bold">
-                <span className="text-black">Zai's</span>
-                <span className="text-gray-500"> Billiard</span>
-              </span>
-              <span className="text-[0.6rem] font-semibold tracking-widest text-gray-400 uppercase mt-0.5">
-                Hall & Bar
-              </span>
-            </NavLink>
-          </div>
+          <NavLink to="/" className="btn btn-ghost px-0 flex flex-col items-start leading-none h-auto py-1">
+            <span className="text-xl font-bold">
+              <span className="text-black">Zai's</span>
+              <span className="text-gray-500"> Billiard</span>
+            </span>
+            <span className="text-[0.6rem] font-semibold tracking-widest text-gray-400 uppercase mt-0.5">
+              Hall & Bar
+            </span>
+          </NavLink>
 
-          {/* Nav Links */}
-          <div className="flex items-center gap-2">
+          {/* Desktop Nav Links */}
+          <div className="hidden md:flex items-center gap-2">
             <NavLink end to="/" className={({ isActive }) => `btn btn-sm rounded-full ${isActive ? 'btn-neutral' : 'btn-ghost'}`}>HOME</NavLink>
             <NavLink to="/book" className={({ isActive }) => `btn btn-sm rounded-full ${isActive ? 'btn-neutral' : 'btn-ghost'}`}>BOOK</NavLink>
             {session && (
               <NavLink to="/my-reservations" className={({ isActive }) => `btn btn-sm rounded-full ${isActive ? 'btn-neutral' : 'btn-ghost'}`}>MY RESERVATION</NavLink>
             )}
 
-            {/* Profile Dropdown */}
+            {/* Desktop Profile Dropdown */}
             {session ? (
               <div className="relative" ref={dropdownRef}>
                 <button
@@ -98,14 +103,11 @@ const NavBar = () => {
 
                 {showDropdown && (
                   <div className="absolute right-0 top-10 w-56 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden">
-                    {/* Header */}
                     <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
                       <p className="font-semibold text-sm text-black truncate">{profile?.name || 'User'}</p>
                       <p className="text-xs text-gray-400 truncate">{profile?.email}</p>
                       <p className="text-xs text-gray-400">{profile?.phone_number}</p>
                     </div>
-
-                    {/* Edit Profile */}
                     <button
                       onMouseDown={openEditModal}
                       className="w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-gray-50 transition-colors text-left"
@@ -113,8 +115,6 @@ const NavBar = () => {
                       <FaEdit className="text-gray-400" />
                       <span>Edit Profile</span>
                     </button>
-
-                    {/* Logout */}
                     <button
                       onMouseDown={handleLogout}
                       className="w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-red-50 text-red-500 transition-colors text-left border-t border-gray-100"
@@ -131,14 +131,82 @@ const NavBar = () => {
               </NavLink>
             )}
           </div>
+
+          {/* Mobile Right — Profile + Hamburger */}
+          <div className="flex md:hidden items-center gap-2">
+            {session && (
+              <div className="w-7 h-7 rounded-full bg-black text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
+                {profile?.name?.[0]?.toUpperCase() || <FaUser />}
+              </div>
+            )}
+            <button
+              onClick={() => setShowMobileMenu(prev => !prev)}
+              className="btn btn-sm btn-ghost rounded-full"
+            >
+              {showMobileMenu ? <FaTimes className="text-lg" /> : <FaBars className="text-lg" />}
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Menu */}
+        {showMobileMenu && (
+          <div className="md:hidden absolute top-16 left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-50 px-4 py-3 flex flex-col gap-1">
+            <NavLink end to="/"
+              onClick={() => setShowMobileMenu(false)}
+              className={({ isActive }) => `btn btn-sm rounded-full justify-start ${isActive ? 'btn-neutral' : 'btn-ghost'}`}>
+              HOME
+            </NavLink>
+            <NavLink to="/book"
+              onClick={() => setShowMobileMenu(false)}
+              className={({ isActive }) => `btn btn-sm rounded-full justify-start ${isActive ? 'btn-neutral' : 'btn-ghost'}`}>
+              BOOK
+            </NavLink>
+            {session && (
+              <NavLink to="/my-reservations"
+                onClick={() => setShowMobileMenu(false)}
+                className={({ isActive }) => `btn btn-sm rounded-full justify-start ${isActive ? 'btn-neutral' : 'btn-ghost'}`}>
+                MY RESERVATION
+              </NavLink>
+            )}
+
+            {session ? (
+              <>
+                <div className="border-t border-gray-100 my-1" />
+                <div className="px-2 py-1">
+                  <p className="font-semibold text-sm text-black">{profile?.name || 'User'}</p>
+                  <p className="text-xs text-gray-400">{profile?.email}</p>
+                </div>
+                <button
+                  onClick={openEditModal}
+                  className="btn btn-sm btn-ghost rounded-full justify-start gap-2"
+                >
+                  <FaEdit className="text-gray-400" />
+                  Edit Profile
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="btn btn-sm btn-ghost rounded-full justify-start gap-2 text-red-500 hover:bg-red-50"
+                >
+                  <FaSignOutAlt />
+                  Log Out
+                </button>
+              </>
+            ) : (
+              <NavLink to="/log-in"
+                onClick={() => setShowMobileMenu(false)}
+                className="btn btn-sm btn-ghost rounded-full justify-start gap-2">
+                <FaUser />
+                Log In
+              </NavLink>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Edit Profile Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4">
-
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
               <h2 className="text-lg font-bold">Edit Profile</h2>
               <button onClick={() => setShowModal(false)} className="btn btn-ghost btn-sm btn-circle">
@@ -152,7 +220,6 @@ const NavBar = () => {
                   {form.name?.[0]?.toUpperCase() || <FaUser />}
                 </div>
               </div>
-
               <div>
                 <label className="text-xs font-semibold text-gray-500 mb-1 block">Full Name</label>
                 <input
@@ -163,7 +230,6 @@ const NavBar = () => {
                   placeholder="Full Name"
                 />
               </div>
-
               <div>
                 <label className="text-xs font-semibold text-gray-500 mb-1 block">Email</label>
                 <input
@@ -174,7 +240,6 @@ const NavBar = () => {
                 />
                 <p className="text-xs text-gray-400 mt-1">Email cannot be changed here.</p>
               </div>
-
               <div>
                 <label className="text-xs font-semibold text-gray-500 mb-1 block">Phone Number</label>
                 <input
@@ -187,7 +252,7 @@ const NavBar = () => {
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 px-6 py-4 border-t border-gray-100 bg-gray-50">
+            <div className="flex justify-end gap-3 px-6 py-4 border-t border-gray-100 bg-gray-50 rounded-b-2xl">
               <button onClick={() => setShowModal(false)} className="btn btn-ghost rounded-full">Cancel</button>
               <button onClick={handleSave} disabled={saving} className="btn btn-neutral rounded-full">
                 {saving ? 'Saving...' : 'Save Changes'}
