@@ -68,83 +68,100 @@ const NavBar = () => {
   return (
     <>
       <div className="navbar bg-base-100 shadow-sm border-b border-gray-200 px-4">
-        <div className="flex items-center justify-between w-full max-w-7xl mx-auto">
+        <div className="w-full max-w-7xl mx-auto">
 
-          {/* Brand */}
-          <NavLink to="/" className="btn btn-ghost px-0 flex flex-col items-start leading-none h-auto py-1">
-            <span className="text-xl font-bold">
-              <span className="text-black">Zai's</span>
-              <span className="text-gray-500"> Billiard</span>
-            </span>
-            <span className="text-[0.6rem] font-semibold tracking-widest text-gray-400 uppercase mt-0.5">
-              Hall & Bar
-            </span>
-          </NavLink>
+          {/* Desktop: Links (left) — Logo (center) — Profile (right) */}
+          <div className="hidden md:grid grid-cols-3 items-center">
+            {/* Left: Nav Links */}
+            <div className="flex items-center gap-2 justify-self-start">
+              <NavLink end to="/" className={({ isActive }) => `btn btn-sm rounded-full ${isActive ? 'btn-neutral' : 'btn-ghost'}`}>HOME</NavLink>
+              <NavLink to="/book" className={({ isActive }) => `btn btn-sm rounded-full ${isActive ? 'btn-neutral' : 'btn-ghost'}`}>BOOK</NavLink>
+              {session && (
+                <NavLink to="/my-reservations" className={({ isActive }) => `btn btn-sm rounded-full ${isActive ? 'btn-neutral' : 'btn-ghost'}`}>MY RESERVATION</NavLink>
+              )}
+            </div>
 
-          {/* Desktop Nav Links */}
-          <div className="hidden md:flex items-center gap-2">
-            <NavLink end to="/" className={({ isActive }) => `btn btn-sm rounded-full ${isActive ? 'btn-neutral' : 'btn-ghost'}`}>HOME</NavLink>
-            <NavLink to="/book" className={({ isActive }) => `btn btn-sm rounded-full ${isActive ? 'btn-neutral' : 'btn-ghost'}`}>BOOK</NavLink>
-            {session && (
-              <NavLink to="/my-reservations" className={({ isActive }) => `btn btn-sm rounded-full ${isActive ? 'btn-neutral' : 'btn-ghost'}`}>MY RESERVATION</NavLink>
-            )}
+            {/* Center: Brand */}
+            <NavLink to="/" className="btn btn-ghost px-0 flex flex-col items-center leading-none h-auto py-1 justify-self-center">
+              <span className="text-xl font-bold">
+                <span className="text-black">Zai's</span>
+                <span className="text-gray-500"> Billiard</span>
+              </span>
+              <span className="text-[0.6rem] font-semibold tracking-widest text-gray-400 uppercase mt-0.5">
+                Hall & Bar
+              </span>
+            </NavLink>
 
-            {/* Desktop Profile Dropdown */}
-            {session ? (
-              <div className="relative" ref={dropdownRef}>
-                <button
-                  onClick={() => setShowDropdown(prev => !prev)}
-                  className="btn btn-sm btn-ghost rounded-full"
-                >
-                  <div className="w-7 h-7 rounded-full bg-black text-white flex items-center justify-center text-xs font-bold">
-                    {profile?.name?.[0]?.toUpperCase() || <FaUser />}
-                  </div>
-                </button>
-
-                {showDropdown && (
-                  <div className="absolute right-0 top-10 w-56 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden">
-                    <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
-                      <p className="font-semibold text-sm text-black truncate">{profile?.name || 'User'}</p>
-                      <p className="text-xs text-gray-400 truncate">{profile?.email}</p>
-                      <p className="text-xs text-gray-400">{profile?.phone_number}</p>
+            {/* Right: Profile Dropdown */}
+            <div className="justify-self-end">
+              {session ? (
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    onClick={() => setShowDropdown(prev => !prev)}
+                    className="btn btn-sm btn-ghost rounded-full"
+                  >
+                    <div className="w-7 h-7 rounded-full bg-black text-white flex items-center justify-center text-xs font-bold">
+                      {profile?.name?.[0]?.toUpperCase() || <FaUser />}
                     </div>
-                    <button
-                      onMouseDown={openEditModal}
-                      className="w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-gray-50 transition-colors text-left"
-                    >
-                      <FaEdit className="text-gray-400" />
-                      <span>Edit Profile</span>
-                    </button>
-                    <button
-                      onMouseDown={handleLogout}
-                      className="w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-red-50 text-red-500 transition-colors text-left border-t border-gray-100"
-                    >
-                      <FaSignOutAlt />
-                      <span>Log Out</span>
-                    </button>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <NavLink to="/log-in" className="btn btn-sm btn-ghost rounded-full">
-                <FaUser />
-              </NavLink>
-            )}
+                  </button>
+
+                  {showDropdown && (
+                    <div className="absolute right-0 top-10 w-56 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden">
+                      <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
+                        <p className="font-semibold text-sm text-black truncate">{profile?.name || 'User'}</p>
+                        <p className="text-xs text-gray-400 truncate">{profile?.email}</p>
+                        <p className="text-xs text-gray-400">{profile?.phone_number}</p>
+                      </div>
+                      <button
+                        onMouseDown={openEditModal}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-gray-50 transition-colors text-left"
+                      >
+                        <FaEdit className="text-gray-400" />
+                        <span>Edit Profile</span>
+                      </button>
+                      <button
+                        onMouseDown={handleLogout}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-red-50 text-red-500 transition-colors text-left border-t border-gray-100"
+                      >
+                        <FaSignOutAlt />
+                        <span>Log Out</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <NavLink to="/log-in" className="btn btn-sm btn-ghost rounded-full">
+                  <FaUser />
+                </NavLink>
+              )}
+            </div>
           </div>
 
-          {/* Mobile Right — Profile + Hamburger */}
-          <div className="flex md:hidden items-center gap-2">
-            {session && (
-              <div className="w-7 h-7 rounded-full bg-black text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
-                {profile?.name?.[0]?.toUpperCase() || <FaUser />}
-              </div>
-            )}
-            <button
-              onClick={() => setShowMobileMenu(prev => !prev)}
-              className="btn btn-sm btn-ghost rounded-full"
-            >
-              {showMobileMenu ? <FaTimes className="text-lg" /> : <FaBars className="text-lg" />}
-            </button>
+          {/* Mobile: Brand (left) — Profile + Hamburger (right) */}
+          <div className="flex md:hidden items-center justify-between">
+            <NavLink to="/" className="btn btn-ghost px-0 flex flex-col items-start leading-none h-auto py-1">
+              <span className="text-xl font-bold">
+                <span className="text-black">Zai's</span>
+                <span className="text-gray-500"> Billiard</span>
+              </span>
+              <span className="text-[0.6rem] font-semibold tracking-widest text-gray-400 uppercase mt-0.5">
+                Hall & Bar
+              </span>
+            </NavLink>
+
+            <div className="flex items-center gap-2">
+              {session && (
+                <div className="w-7 h-7 rounded-full bg-black text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
+                  {profile?.name?.[0]?.toUpperCase() || <FaUser />}
+                </div>
+              )}
+              <button
+                onClick={() => setShowMobileMenu(prev => !prev)}
+                className="btn btn-sm btn-ghost rounded-full"
+              >
+                {showMobileMenu ? <FaTimes className="text-lg" /> : <FaBars className="text-lg" />}
+              </button>
+            </div>
           </div>
         </div>
 

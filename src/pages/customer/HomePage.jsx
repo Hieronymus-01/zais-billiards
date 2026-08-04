@@ -18,16 +18,40 @@ const HomePage = () => {
           </Link>
         </div>
 
-        {/* Hero image placeholder - from wireframe */}
-        <div className="flex gap-3">
-          <div className="w-32 h-40 bg-gray-200 rounded-xl flex items-center justify-center">
-            <span className="text-gray-400 text-xs text-center">Billiard<br />Photo</span>
+        {/* Hero image + doodle illustration - matches updated wireframe */}
+        <div className="relative w-64 h-56 flex-shrink-0 hidden sm:block">
+          {/* Hand-drawn doodle: swirl, cue stick, 7-ball */}
+          <svg
+            viewBox="0 0 260 220"
+            className="absolute inset-0 w-full h-full overflow-visible pointer-events-none"
+            fill="none"
+          >
+            {/* Scribble swirl framing the cards */}
+            <path
+              d="M70,55 C40,15 130,-15 190,10 C245,32 255,90 225,125
+                 C200,155 165,175 135,168 C160,178 200,172 222,150"
+              stroke="#111827"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              fill="none"
+            />
+            {/* Cue stick */}
+            <line x1="8" y1="150" x2="150" y2="45" stroke="#111827" strokeWidth="2.5" strokeLinecap="round" />
+            <line x1="8" y1="150" x2="24" y2="140" stroke="#111827" strokeWidth="4" strokeLinecap="round" />
+
+            {/* 7-ball */}
+            <circle cx="34" cy="118" r="19" fill="#111827" />
+            <circle cx="34" cy="118" r="19" fill="none" stroke="#111827" strokeWidth="1" />
+            <circle cx="27" cy="111" r="4" fill="white" opacity="0.5" />
+            <text x="34" y="123" fontSize="15" fontWeight="700" fill="white" textAnchor="middle">7</text>
+          </svg>
+
+          {/* Overlapping tilted photo cards */}
+          <div className="absolute top-10 left-14 w-28 h-36 bg-gray-300 rounded-xl shadow-md -rotate-6 flex items-center justify-center">
+            <span className="text-gray-500 text-xs text-center">Billiard<br />Photo</span>
           </div>
-          <div className="w-28 h-36 bg-gray-300 rounded-xl flex items-center justify-center mt-6">
-            <span className="text-gray-400 text-xs text-center">Billiard<br />Photo</span>
-          </div>
-          <div className="w-28 h-36 bg-gray-200 rounded-xl flex items-center justify-center mt-3">
-            <span className="text-gray-400 text-xs text-center">Billiard<br />Photo</span>
+          <div className="absolute top-2 left-32 w-28 h-36 bg-gray-200 rounded-xl shadow-md rotate-6 flex items-center justify-center">
+            <span className="text-gray-500 text-xs text-center">Billiard<br />Photo</span>
           </div>
         </div>
       </section>
